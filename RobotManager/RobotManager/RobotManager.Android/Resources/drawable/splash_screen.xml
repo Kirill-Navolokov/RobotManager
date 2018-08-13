@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+	<item>
+		<shape android:shape="rectangle" >
+			<solid android:color="@color/splashScreenBackground"/>
+		</shape>
+	</item>
+		<item xmlns:android="http://schemas.android.com/apk/res/android"
+						android:layout_width="50dp"
+		        android:layout_height="50dp"
+						android:drawable="@drawable/icon_robot"
+						android:gravity="center" />
+</layer-list>

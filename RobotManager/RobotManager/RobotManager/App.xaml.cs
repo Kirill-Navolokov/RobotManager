@@ -1,4 +1,3 @@
-using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -10,8 +9,6 @@ namespace RobotManager
 		public App ()
 		{
 			InitializeComponent();
-
-			MainPage = new MainPage();
 		}
 
 		protected override void OnStart ()
