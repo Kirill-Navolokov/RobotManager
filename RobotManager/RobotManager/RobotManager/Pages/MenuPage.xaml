@@ -23,10 +23,12 @@
 			Spacing="5">
 			<Button
 				Style="{StaticResource MenuItemButtonStyle}"
-				Text="SETTINGS"/>
+				Text="{Binding SettingsTitle}"
+				Command="{Binding GoToSettingsPageCommand}"/>
 			<Button
 				Style="{StaticResource MenuItemButtonStyle}"
-				Text="ABOUT"/>
+				Text="{Binding AboutTitle}"
+				Command="{Binding GoToAboutPageCommand}"/>
 		</StackLayout>
 	</StackLayout>
 </d:MvxContentPage>

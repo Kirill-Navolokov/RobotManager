@@ -1,5 +1,4 @@
-﻿using System;
-using MvvmCross.Localization;
+﻿using MvvmCross.Localization;
 
 namespace RobotManager.Core.Services.Implementation
 {

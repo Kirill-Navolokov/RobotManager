@@ -11,7 +11,7 @@ namespace RobotManager.Core.ViewModels
 			TextSource = serviceProvider.LanguageBinder;
 		}
 
-		protected string Title { get; set; }
+		public string Title { get; set; }
 
 		protected IMvxLanguageBinder TextSource { get; }
 	}

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<d:MvxContentPage x:TypeArguments="viewModels:AboutViewModel" 
+	xmlns="http://xamarin.com/schemas/2014/forms" 
+	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+	x:Class="RobotManager.Pages.AboutPage"
+	xmlns:d="clr-namespace:MvvmCross.Forms.Views;assembly=MvvmCross.Forms"
+	xmlns:bindings="clr-namespace:MvvmCross.Forms.Bindings;assembly=MvvmCross.Forms"
+	xmlns:viewModels="clr-namespace:RobotManager.Core.ViewModels;assembly=RobotManager.Core"
+	Title="{Binding Title}">
+	<StackLayout
+		BackgroundColor="SteelBlue">
+		<Label 
+			Text="{Binding Content}"
+			TextColor="Azure"
+			FontAttributes="Bold"
+			FontSize="Large"/>
+	</StackLayout>
+</d:MvxContentPage>

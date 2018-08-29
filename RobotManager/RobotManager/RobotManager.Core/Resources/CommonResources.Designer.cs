@@ -59,5 +59,32 @@ namespace RobotManager.Core.Resources {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to About.
+        /// </summary>
+        internal static string About {
+            get {
+                return ResourceManager.GetString("About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This application was developed by Kyrylo Navolokov as a part of diploma project. Main technologies are: C#, Xamarin, MvvmCross;.
+        /// </summary>
+        internal static string AboutPage_Content {
+            get {
+                return ResourceManager.GetString("AboutPage_Content", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        internal static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
     }
 }
