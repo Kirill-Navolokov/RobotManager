@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<d:MvxContentPage x:TypeArguments="viewModels:MenuViewModel" 
+	xmlns="http://xamarin.com/schemas/2014/forms" 
+	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+	x:Class="RobotManager.Pages.MenuPage"
+	xmlns:d="clr-namespace:MvvmCross.Forms.Views;assembly=MvvmCross.Forms"
+	xmlns:bindings="clr-namespace:MvvmCross.Forms.Bindings;assembly=MvvmCross.Forms"
+	xmlns:viewModels="clr-namespace:RobotManager.Core.ViewModels;assembly=RobotManager.Core"
+	Title="DrawerPageDefaultTitle">
+	<StackLayout
+		BackgroundColor="Azure"
+		Orientation="Vertical">
+		<StackLayout
+			Margin="10">
+			<Image
+				Source="icon_nure"/>
+		</StackLayout>
+		<StackLayout
+			BackgroundColor="SteelBlue"
+			VerticalOptions="FillAndExpand"
+			Orientation="Vertical"
+			Padding="5"
+			Spacing="5">
+			<Button
+				Style="{StaticResource MenuItemButtonStyle}"
+				Text="SETTINGS"/>
+			<Button
+				Style="{StaticResource MenuItemButtonStyle}"
+				Text="ABOUT"/>
+		</StackLayout>
+	</StackLayout>
+</d:MvxContentPage>
