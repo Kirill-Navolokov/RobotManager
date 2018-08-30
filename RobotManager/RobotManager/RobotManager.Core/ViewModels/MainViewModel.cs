@@ -27,8 +27,8 @@ namespace RobotManager.Core.ViewModels
 
 		private async Task Init()
 		{
-			await NavigationService.Navigate<MenuViewModel>();
-			await NavigationService.Navigate<StartViewModel>();
+			await NavigateTo<MenuViewModel>();
+			await NavigateTo<StartViewModel>();
 		}
 
 		private void OnException(Exception ex)

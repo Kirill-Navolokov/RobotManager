@@ -7,17 +7,17 @@ using RobotManager.Interfaces;
 namespace RobotManager.Pages
 {
 	[MvxMasterDetailPagePresentation(MasterDetailPosition.Detail, WrapInNavigationPage = true, NoHistory = true)]
-	public partial class StartPage : MvxContentPage<StartViewModel>
+	public partial class SettingsPage : MvxContentPage<SettingsViewModel>
 	{
 		private readonly IMenuService _menuService;
 
-		public StartPage ()
+		public SettingsPage()
 		{
 			_menuService = DiResolver.Instance.Resolve<IMenuService>();
 
-			InitializeComponent ();
+			InitializeComponent();
 		}
-		
+
 		protected override void OnDisappearing()
 		{
 			_menuService.CloseMenu();

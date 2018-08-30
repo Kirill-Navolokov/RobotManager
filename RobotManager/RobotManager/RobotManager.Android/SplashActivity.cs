@@ -2,6 +2,8 @@
 using Android.Content.PM;
 using Android.OS;
 using MvvmCross.Forms.Platforms.Android.Views;
+using RobotManager.Core.DI;
+using RobotManager.DI;
 
 namespace RobotManager.Droid
 {
@@ -14,6 +16,7 @@ namespace RobotManager.Droid
 	{
 		protected override void RunAppStart(Bundle bundle)
 		{
+			FormsDiModule.LoadTo(DiResolver.Instance);
 			StartActivity(typeof(MainActivity));
 			base.RunAppStart(bundle);
 		}

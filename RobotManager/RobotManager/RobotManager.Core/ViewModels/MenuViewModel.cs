@@ -1,4 +1,5 @@
-﻿using MvvmCross.Commands;
+﻿using System.Threading.Tasks;
+using MvvmCross.Commands;
 using IServiceProvider = RobotManager.Core.Services.Interfaces.IServiceProvider;
 
 namespace RobotManager.Core.ViewModels
@@ -7,26 +8,36 @@ namespace RobotManager.Core.ViewModels
 	{
 		public MenuViewModel(IServiceProvider serviceProvider) : base(serviceProvider)
 		{
-			GoToSettingsPageCommand = new MvxCommand(OnSettingsCommand);
-			GoToAboutPageCommand = new MvxCommand(OnAboutCommand);
+			StartCommand = new MvxAsyncCommand(OnStartCommand);
+			SettingsCommand = new MvxAsyncCommand(OnSettingsCommand);
+			AboutCommand = new MvxAsyncCommand(OnAboutCommand);
 		}
 
 		public string SettingsTitle => TextSource.GetText("Settings");
 
 		public string AboutTitle => TextSource.GetText("About");
 
-		public MvxCommand GoToSettingsPageCommand { get; }
+		public string StartTitle => TextSource.GetText("Start");
 
-		public MvxCommand GoToAboutPageCommand { get; }
+		public MvxAsyncCommand SettingsCommand { get; }
 
-		private void OnSettingsCommand()
+		public MvxAsyncCommand AboutCommand { get; }
+
+		public MvxAsyncCommand StartCommand { get; }
+
+		private async Task OnSettingsCommand()
 		{
-			NavigationService.Navigate<SettingsViewModel>();
+			await NavigateTo<SettingsViewModel>();
 		}
 
-		private void OnAboutCommand()
+		private async Task OnAboutCommand()
 		{
-			NavigationService.Navigate<AboutViewModel>();
+			await NavigateTo<AboutViewModel>();
+		}
+
+		private async Task OnStartCommand()
+		{
+			await NavigateTo<StartViewModel>();
 		}
 	}
 }

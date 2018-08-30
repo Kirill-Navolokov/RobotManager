@@ -6,6 +6,7 @@ namespace RobotManager.Core.ViewModels
 	{
 		public SettingsViewModel(IServiceProvider serviceProvider) : base(serviceProvider)
 		{
+			Title = TextSource.GetText("Settings");
 		}
 	}
 }

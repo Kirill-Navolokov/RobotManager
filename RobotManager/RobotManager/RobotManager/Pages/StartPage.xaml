@@ -7,30 +7,41 @@
 	xmlns:bindings="clr-namespace:MvvmCross.Forms.Bindings;assembly=MvvmCross.Forms"
 	xmlns:viewModels="clr-namespace:RobotManager.Core.ViewModels;assembly=RobotManager.Core"
 	xmlns:forms="clr-namespace:Lottie.Forms;assembly=Lottie.Forms">
-	<StackLayout
-		BackgroundColor="SteelBlue"
-		Orientation="Vertical">
-		<forms:AnimationView
-			HorizontalOptions="EndAndExpand"
-			VerticalOptions="Start"
-			Animation="settings.json"
-			Margin="0,-20"
-			Loop="True"
-			AutoPlay="True"
-			HeightRequest="100"
-			WidthRequest="100"/>
-		<Button 
-			Margin="22,270,22,0"
-			Style="{StaticResource MenuItemButtonStyle}"
-			VerticalOptions="End"
-			Text="{Binding ConnectButtonText}"/>
-		<forms:AnimationView
-			HorizontalOptions="CenterAndExpand"
-			VerticalOptions="EndAndExpand"
-			Animation="navi's_loader.json"
-			Loop="True"
-			AutoPlay="True"
-			HeightRequest="200"
-			WidthRequest="200"/>
-	</StackLayout>
+	<ScrollView>
+		<StackLayout
+			BackgroundColor="SteelBlue"
+			Orientation="Vertical">
+			<forms:AnimationView
+				x:Name="SettingsAnimation"
+				HorizontalOptions="EndAndExpand"
+				VerticalOptions="Start"
+				Animation="settings.json"
+				Margin="0,-20"
+				Loop="True"
+				AutoPlay="True"
+				HeightRequest="100"
+				WidthRequest="100"
+				ClickedCommand="{Binding SettingsCommand}"/>
+			<Image
+				Rotation="-10"
+				Margin="0,50,10,0"
+				HorizontalOptions="CenterAndExpand"
+				Source="icon_logo"/>
+			<Button 
+				Margin="22,100,22,0"
+				Style="{StaticResource MenuItemButtonStyle}"
+				VerticalOptions="End"
+				Command="{Binding ConnectCommand}"
+				Text="{Binding ConnectButtonText}"/>
+			<forms:AnimationView
+				x:Name="RobotAnimation"
+				HorizontalOptions="CenterAndExpand"
+				VerticalOptions="EndAndExpand"
+				Animation="navi's_loader.json"
+				Loop="True"
+				AutoPlay="True"
+				HeightRequest="200"
+				WidthRequest="200"/>
+		</StackLayout>
+	</ScrollView>
 </d:MvxContentPage>
