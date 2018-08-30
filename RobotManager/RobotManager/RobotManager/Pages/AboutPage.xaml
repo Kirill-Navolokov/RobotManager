@@ -9,7 +9,8 @@
 	Title="{Binding Title}">
 	<StackLayout
 		BackgroundColor="SteelBlue">
-		<Label 
+		<Label
+			Margin="0,30"
 			Text="{Binding Content}"
 			TextColor="Azure"
 			FontAttributes="Bold"

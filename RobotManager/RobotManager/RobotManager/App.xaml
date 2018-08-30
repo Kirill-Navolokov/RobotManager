@@ -9,5 +9,10 @@
 			<Setter Property="FontSize" Value="Medium"/>
 			<Setter Property="FontAttributes" Value="Bold"/>
 		</Style>
+
+		<Style TargetType="NavigationPage">
+			<Setter Property="BarBackgroundColor" Value="SteelBlue"/>
+			<Setter Property="BarTextColor" Value="Azure"/>
+		</Style>
 	</Application.Resources>
 </Application>

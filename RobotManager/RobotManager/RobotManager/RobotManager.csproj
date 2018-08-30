@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Com.Airbnb.Xamarin.Forms.Lottie" Version="2.5.4" />
     <PackageReference Include="MvvmCross.Forms" Version="6.1.2" />
     <PackageReference Include="MvvmCross.Plugin.Messenger" Version="6.1.2" />
     <PackageReference Include="MvvmCross.Plugin.ResxLocalization" Version="6.1.2" />

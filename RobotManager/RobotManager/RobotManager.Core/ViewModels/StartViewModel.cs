@@ -7,5 +7,7 @@ namespace RobotManager.Core.ViewModels
 		public StartViewModel(IServiceProvider serviceProvider) : base(serviceProvider)
 		{
 		}
+
+		public string ConnectButtonText => TextSource.GetText("Connect");
 	}
 }

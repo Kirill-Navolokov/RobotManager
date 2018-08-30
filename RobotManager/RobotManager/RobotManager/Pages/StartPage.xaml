@@ -1,10 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <d:MvxContentPage x:TypeArguments="viewModels:StartViewModel" 
-                  xmlns="http://xamarin.com/schemas/2014/forms" 
-                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
-                  x:Class="RobotManager.Pages.StartPage"
-                  xmlns:d="clr-namespace:MvvmCross.Forms.Views;assembly=MvvmCross.Forms"
-                  xmlns:bindings="clr-namespace:MvvmCross.Forms.Bindings;assembly=MvvmCross.Forms"
-                  xmlns:viewModels="clr-namespace:RobotManager.Core.ViewModels;assembly=RobotManager.Core"
-                  Title="DrawerPageDefaultTitle">
+	xmlns="http://xamarin.com/schemas/2014/forms" 
+	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+	x:Class="RobotManager.Pages.StartPage"
+	xmlns:d="clr-namespace:MvvmCross.Forms.Views;assembly=MvvmCross.Forms"
+	xmlns:bindings="clr-namespace:MvvmCross.Forms.Bindings;assembly=MvvmCross.Forms"
+	xmlns:viewModels="clr-namespace:RobotManager.Core.ViewModels;assembly=RobotManager.Core"
+	xmlns:forms="clr-namespace:Lottie.Forms;assembly=Lottie.Forms">
+	<StackLayout
+		BackgroundColor="SteelBlue"
+		Orientation="Vertical">
+		<forms:AnimationView
+			HorizontalOptions="EndAndExpand"
+			VerticalOptions="Start"
+			Animation="settings.json"
+			Margin="0,-20"
+			Loop="True"
+			AutoPlay="True"
+			HeightRequest="100"
+			WidthRequest="100"/>
+		<Button 
+			Margin="22,270,22,0"
+			Style="{StaticResource MenuItemButtonStyle}"
+			VerticalOptions="End"
+			Text="{Binding ConnectButtonText}"/>
+		<forms:AnimationView
+			HorizontalOptions="CenterAndExpand"
+			VerticalOptions="EndAndExpand"
+			Animation="navi's_loader.json"
+			Loop="True"
+			AutoPlay="True"
+			HeightRequest="200"
+			WidthRequest="200"/>
+	</StackLayout>
 </d:MvxContentPage>

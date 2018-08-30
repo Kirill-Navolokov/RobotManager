@@ -123,6 +123,9 @@
   <data name="AboutPage_Content" xml:space="preserve">
     <value>This application was developed by Kyrylo Navolokov as a part of diploma project. Main technologies are: C#, Xamarin, MvvmCross;</value>
   </data>
+  <data name="Connect" xml:space="preserve">
+    <value>Connect</value>
+  </data>
   <data name="Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
