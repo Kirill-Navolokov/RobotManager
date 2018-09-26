@@ -7,4 +7,5 @@
 	xmlns:bindings="clr-namespace:MvvmCross.Forms.Bindings;assembly=MvvmCross.Forms"
 	xmlns:viewModels="clr-namespace:RobotManager.Core.ViewModels;assembly=RobotManager.Core"
 	Title="{Binding Title}">
+	
 </d:MvxContentPage>

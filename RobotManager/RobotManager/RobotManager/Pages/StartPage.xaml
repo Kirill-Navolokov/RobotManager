@@ -11,17 +11,17 @@
 		<StackLayout
 			BackgroundColor="SteelBlue"
 			Orientation="Vertical">
-			<forms:AnimationView
-				x:Name="SettingsAnimation"
-				HorizontalOptions="EndAndExpand"
-				VerticalOptions="Start"
-				Animation="settings.json"
-				Margin="0,-20"
-				Loop="True"
-				AutoPlay="True"
-				HeightRequest="100"
-				WidthRequest="100"
-				ClickedCommand="{Binding SettingsCommand}"/>
+<!--			<forms:AnimationView-->
+<!--				x:Name="SettingsAnimation"-->
+<!--				HorizontalOptions="EndAndExpand"-->
+<!--				VerticalOptions="Start"-->
+<!--				Animation="settings.json"-->
+<!--				Margin="0,-20"-->
+<!--				Loop="True"-->
+<!--				AutoPlay="True"-->
+<!--				HeightRequest="100"-->
+<!--				WidthRequest="100"-->
+<!--				ClickedCommand="{Binding SettingsCommand}"/>-->
 			<Image
 				Rotation="-10"
 				Margin="0,50,10,0"
