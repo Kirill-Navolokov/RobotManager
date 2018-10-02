@@ -70,11 +70,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomRenderer\CameraRenderer.cs" />
+    <Compile Include="Listeneres\CameraCaptureSessionCaptureCallback.cs" />
+    <Compile Include="Listeneres\CameraCaptureSessionCaptureCallback2.cs" />
+    <Compile Include="Listeneres\CameraCaptureSessionStateCallback .cs" />
+    <Compile Include="Listeneres\CameraDeviceStateCallback.cs" />
+    <Compile Include="Listeneres\TextureViewSurfaceTextureListener.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="SplashActivity.cs" />
+    <Compile Include="Util\CameraStates.cs" />
+    <Compile Include="Util\CompareSizesByArea.cs" />
+    <Compile Include="Util\ConfirmationDialog.cs" />
+    <Compile Include="Util\ErrorDialog.cs" />
+    <Compile Include="Util\NegativeClickListener.cs" />
+    <Compile Include="Util\PositiveClickListener.cs" />
     <Compile Include="Views\AutoFitTextureView.cs" />
   </ItemGroup>
   <ItemGroup>
