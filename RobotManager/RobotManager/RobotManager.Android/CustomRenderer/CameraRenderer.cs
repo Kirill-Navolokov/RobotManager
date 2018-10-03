@@ -19,6 +19,7 @@ using Android.Views;
 using Android.Widget;
 using Java.Lang;
 using Java.Util;
+using Java.Util.Concurrent;
 using RobotManager.Droid.CustomRenderer;
 using RobotManager.Droid.Listeneres;
 using RobotManager.Droid.Util;
@@ -212,7 +213,7 @@ namespace RobotManager.Droid.CustomRenderer
 							break;
 					}
 
-					Point displaySize = new Point();
+					Android.Graphics.Point displaySize = new Android.Graphics.Point();
 					activity.WindowManager.DefaultDisplay.GetSize(displaySize);
 					int rotatedPreviewWidth = width;
 					int rotatedPreviewHeight = height;
@@ -586,7 +587,7 @@ namespace RobotManager.Droid.CustomRenderer
 		public const int RequestCameraPermissionCode = 1;
 		const string FragmentDialog = "dialog";
 
-		static CameraPageRenderer()
+		static CameraRenderer()
 		{
 			Orientations.Append((int)SurfaceOrientation.Rotation0, 90);
 			Orientations.Append((int)SurfaceOrientation.Rotation90, 0);
@@ -597,7 +598,7 @@ namespace RobotManager.Droid.CustomRenderer
 		/// <summary>
 		/// Tag for the Log
 		/// </summary>
-		public new const string Tag = nameof(CameraPageRenderer);
+		public new const string Tag = nameof(CameraRenderer);
 
 		// Camera states moved to an enum
 
