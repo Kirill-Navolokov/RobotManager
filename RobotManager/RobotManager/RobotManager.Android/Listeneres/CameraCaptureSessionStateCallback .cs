@@ -28,8 +28,6 @@ namespace RobotManager.Droid.Listeneres
 				// Auto focus should be continuous for camera preview.
 				Parent.PreviewRequestBuilder.Set(CaptureRequest.ControlAfMode, (int)
 					ControlAFMode.ContinuousPicture);
-				// Flash is automatically enabled when necessary.
-				Parent.SetAutoFlash(Parent.PreviewRequestBuilder);
 
 				// Finally, we start displaying the camera preview.
 				Parent.mPreviewRequest = Parent.PreviewRequestBuilder.Build();

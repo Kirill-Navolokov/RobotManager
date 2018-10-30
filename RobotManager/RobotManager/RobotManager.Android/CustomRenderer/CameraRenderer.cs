@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Android;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
-using Android.Hardware;
 using Android.Hardware.Camera2;
 using Android.Hardware.Camera2.Params;
 using Android.Media;
@@ -23,30 +21,19 @@ using Java.Util.Concurrent;
 using RobotManager.Droid.CustomRenderer;
 using RobotManager.Droid.Listeneres;
 using RobotManager.Droid.Util;
-using RobotManager.Droid.Views;
 using RobotManager.Pages;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
-using Button = Android.Widget.Button;
-using Camera = Android.Hardware.Camera;
-using Point = System.Drawing.Point;
-using Size = Xamarin.Forms.Size;
 using View = Android.Views.View;
 
 [assembly: ExportRenderer(typeof(ManagementPage), typeof(CameraRenderer))]
 namespace RobotManager.Droid.CustomRenderer
-{/*
-     * Display Camera Stream: http://developer.xamarin.com/recipes/android/other_ux/textureview/display_a_stream_from_the_camera/
-     * Camera Rotation: http://stackoverflow.com/questions/3841122/android-camera-preview-is-sideways
-     */
-	public class CameraRenderer : PageRenderer,
-		View.IOnClickListener,
-		ActivityCompat.IOnRequestPermissionsResultCallback,
-		ImageReader.IOnImageAvailableListener
+{
+	//Display Camera Stream: http://developer.xamarin.com/recipes/android/other_ux/textureview/display_a_stream_from_the_camera/
+	//Camera Rotation: http://stackoverflow.com/questions/3841122/android-camera-preview-is-sideways
+	public class CameraRenderer : PageRenderer
 	{
-
-		View view;
-		Button takePhotoButton;
+		private View _view;
 		public Activity Activity => Context as Activity;
 
 		public CameraRenderer(Context context) : base(context)
@@ -56,23 +43,20 @@ namespace RobotManager.Droid.CustomRenderer
 		protected override void OnElementChanged(ElementChangedEventArgs<Page> e)
 		{
 			base.OnElementChanged(e);
+
 			if (e.OldElement != null || Element == null)
+			{
 				return;
+			}
 
-
-			mSurfaceTextureListener = new TextureViewSurfaceTextureListener(this);
-			mStateCallback = new CameraDeviceStateCallback(this);
+			_mSurfaceTextureListener = new TextureViewSurfaceTextureListener(this);
+			_mStateCallback = new CameraDeviceStateCallback(this);
 			CaptureCallback = new CameraCaptureSessionCaptureCallback(this);
 
-
-
-			view = Activity.LayoutInflater.Inflate(Resource.Layout.camera_layout, this, false);
-			//view.FindViewById(Resource.Id.picture).SetOnClickListener(this);
-			//view.FindViewById(Resource.Id.info).SetOnClickListener(this);
-			TextureView = view.FindViewById<TextureView>(Resource.Id.textureView);
+			_view = Activity.LayoutInflater.Inflate(Resource.Layout.camera_layout, this, false);
+			TextureView = _view.FindViewById<TextureView>(Resource.Id.textureView);
 
 			StartBackgroundThread();
-
 
 			// When the screen is turned off and turned back on, the SurfaceTexture is already
 			// available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
@@ -84,25 +68,10 @@ namespace RobotManager.Droid.CustomRenderer
 			}
 			else
 			{
-				TextureView.SurfaceTextureListener = mSurfaceTextureListener;
+				TextureView.SurfaceTextureListener = _mSurfaceTextureListener;
 			}
 
-
-			takePhotoButton = view.FindViewById<global::Android.Widget.Button>(Resource.Id.takePhotoButton);
-			takePhotoButton.Click += TakePhotoButtonTapped;
-
-			//switchCameraButton = view.FindViewById<global::Android.Widget.Button>(Resource.Id.switchCameraButton);
-			//switchCameraButton.Click += SwitchCameraButtonTapped;
-
-			//cancelCameraButton = view.FindViewById<global::Android.Widget.Button>(Resource.Id.cancelPhotoButton);
-			//cancelCameraButton.Click += CancelCameraButtonTapped;
-
-			//frontCameraIcon = Context.Resources.GetDrawable(Resource.Drawable.ic_camera_front_white_24dp);
-			//rearCameraIcon = Context.Resources.GetDrawable(Resource.Drawable.ic_camera_rear_white_24dp);
-
-			//AddView(view);
-
-			AddView(view);
+			AddView(_view);
 		}
 
 		protected override void OnLayout(bool changed, int l, int t, int r, int b)
@@ -112,14 +81,8 @@ namespace RobotManager.Droid.CustomRenderer
 			var msw = MeasureSpec.MakeMeasureSpec(r - l, MeasureSpecMode.Exactly);
 			var msh = MeasureSpec.MakeMeasureSpec(b - t, MeasureSpecMode.Exactly);
 
-			view.Measure(msw, msh);
-			view.Layout(0, 0, r - l, b - t);
-		}
-
-		private async void TakePhotoButtonTapped(object sender, EventArgs e)
-		{
-			TakePicture();
-			//await App.Current.MainPage.Navigation.PushAsync(manipulatePic, false);
+			_view.Measure(msw, msh);
+			_view.Layout(0, 0, r - l, b - t);
 		}
 
 		private void RequestCameraPermission()
@@ -130,14 +93,12 @@ namespace RobotManager.Droid.CustomRenderer
 			}
 			else
 			{
-				ActivityCompat.RequestPermissions(Activity, new string[] { Manifest.Permission.Camera },
-						RequestCameraPermissionCode);
+				ActivityCompat.RequestPermissions(Activity, new[] { Manifest.Permission.Camera }, RequestCameraPermissionCode);
 			}
 		}
 
 		public void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
 		{
-
 			if (requestCode == RequestCameraPermissionCode)
 			{
 				if (grantResults.Length != 1 || grantResults[0] != Permission.Granted)
@@ -145,10 +106,6 @@ namespace RobotManager.Droid.CustomRenderer
 					ErrorDialog.NewInstance(/*Activity.GetString(Resource.String.request_permission)*/ "Permission")
 							.Show(Activity.FragmentManager, FragmentDialog);
 				}
-			}
-			else
-			{
-				//base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 			}
 		}
 
@@ -159,23 +116,24 @@ namespace RobotManager.Droid.CustomRenderer
 		/// <param name="height">The height of available size for camera preview</param>
 		private void SetUpCameraOutputs(int width, int height)
 		{
-			Activity activity = Activity;
-			CameraManager manager = (CameraManager)activity.GetSystemService(Service.CameraService);
+			var activity = Activity;
+			var manager = (CameraManager)activity.GetSystemService(Service.CameraService);
 			try
 			{
 				foreach (var cameraId in manager.GetCameraIdList())
 				{
-					CameraCharacteristics characteristics
-							= manager.GetCameraCharacteristics(cameraId);
+					var characteristics = manager.GetCameraCharacteristics(cameraId);
 
 					// We don't use a front facing camera in this sample.
 					var facing = ((Integer)characteristics.Get(CameraCharacteristics.LensFacing))?.IntValue();
+
 					if (facing != null && facing == (int)LensFacing.Front)
 					{
 						continue;
 					}
 
 					var map = (StreamConfigurationMap)characteristics.Get(CameraCharacteristics.ScalerStreamConfigurationMap);
+
 					if (map == null)
 					{
 						continue;
@@ -185,28 +143,28 @@ namespace RobotManager.Droid.CustomRenderer
 					var outputSizes = Arrays.AsList(map.GetOutputSizes((int)ImageFormatType.Jpeg));
 
 
-					Size largest = (Size)outputSizes[outputSizes.Count / 2];//Collections.Min(outputSizes,new CompareSizesByArea());
-					mImageReader = ImageReader.NewInstance(largest.Width, largest.Height, ImageFormatType.Jpeg, 2);
-					mImageReader.SetOnImageAvailableListener(this, BackgroundHandler);
+					var largest = (Android.Util.Size)outputSizes[outputSizes.Count / 2];//Collections.Min(outputSizes,new CompareSizesByArea());
+					_mImageReader = ImageReader.NewInstance(largest.Width, largest.Height, ImageFormatType.Jpeg, 2);
+					//mImageReader.SetOnImageAvailableListener(this, BackgroundHandler);
 
 					// Find out if we need to swap dimension to get the preview size relative to sensor
 					// coordinate.
 					var displayRotation = activity.WindowManager.DefaultDisplay.Rotation;
 					//noinspection ConstantConditions
-					mSensorOrientation = ((Integer)characteristics.Get(CameraCharacteristics.SensorOrientation)).IntValue();
+					_mSensorOrientation = ((Integer)characteristics.Get(CameraCharacteristics.SensorOrientation)).IntValue();
 					var swappedDimensions = false;
 					switch (displayRotation)
 					{
 						case SurfaceOrientation.Rotation0:
 						case SurfaceOrientation.Rotation180:
-							if (mSensorOrientation == 90 || mSensorOrientation == 270)
+							if (_mSensorOrientation == 90 || _mSensorOrientation == 270)
 							{
 								swappedDimensions = true;
 							}
 							break;
 						case SurfaceOrientation.Rotation90:
 						case SurfaceOrientation.Rotation270:
-							if (mSensorOrientation == 0 || mSensorOrientation == 180)
+							if (_mSensorOrientation == 0 || _mSensorOrientation == 180)
 							{
 								swappedDimensions = true;
 							}
@@ -215,10 +173,10 @@ namespace RobotManager.Droid.CustomRenderer
 
 					Android.Graphics.Point displaySize = new Android.Graphics.Point();
 					activity.WindowManager.DefaultDisplay.GetSize(displaySize);
-					int rotatedPreviewWidth = width;
-					int rotatedPreviewHeight = height;
-					int maxPreviewWidth = displaySize.X;
-					int maxPreviewHeight = displaySize.Y;
+					var rotatedPreviewWidth = width;
+					var rotatedPreviewHeight = height;
+					var maxPreviewWidth = displaySize.X;
+					var maxPreviewHeight = displaySize.Y;
 
 					if (swappedDimensions)
 					{
@@ -241,26 +199,11 @@ namespace RobotManager.Droid.CustomRenderer
 					// Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
 					// bus' bandwidth limitation, resulting in gorgeous previews but the storage of
 					// garbage capture data.
-					mPreviewSize = ChooseOptimalSize(map.GetOutputSizes(Class.FromType(typeof(SurfaceTexture))),
+					_mPreviewSize = ChooseOptimalSize(map.GetOutputSizes(Class.FromType(typeof(SurfaceTexture))),
 						rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
 						maxPreviewHeight, largest);
 
-					// We fit the aspect ratio of TextureView to the size of preview we picked.
-					//var orientation = Resources.Configuration.Orientation;
-					//if (orientation == Android.Content.Res.Orientation.Landscape)
-					//{
-					//    TextureView.SetAspectRatio(mPreviewSize.Width, mPreviewSize.Height);
-					//}
-					//else
-					//{
-					//    TextureView.SetAspectRatio(mPreviewSize.Height, mPreviewSize.Width);
-					//}
-
-					// Check if the flash is supported.
-					var available = ((Java.Lang.Boolean)characteristics.Get(CameraCharacteristics.FlashInfoAvailable))?.BooleanValue();
-					mFlashSupported = available == null ? false : available.Value;
-
-					mCameraId = cameraId;
+					_mCameraId = cameraId;
 					return;
 				}
 			}
@@ -273,12 +216,12 @@ namespace RobotManager.Droid.CustomRenderer
 				// Currently an NPE is thrown when the Camera2API is used but not supported on the
 				// device this code runs.
 				ErrorDialog.NewInstance(/*Activity.GetString(Resource.String.camera_error)*/"Error")
-						.Show(Activity.FragmentManager, FragmentDialog);
+							.Show(Activity.FragmentManager, FragmentDialog);
 			}
 		}
 
 		/// <summary>
-		/// Opens the camera specified by mCameraId
+		/// Opens the camera specified by _mCameraId
 		/// </summary>
 		/// <param name="width"></param>
 		/// <param name="height"></param>
@@ -293,14 +236,14 @@ namespace RobotManager.Droid.CustomRenderer
 			SetUpCameraOutputs(width, height);
 			ConfigureTransform(width, height);
 			var activity = Activity;
-			CameraManager manager = (CameraManager)activity.GetSystemService(Service.CameraService);
+			var manager = (CameraManager)activity.GetSystemService(Service.CameraService);
 			try
 			{
 				if (!mCameraOpenCloseLock.TryAcquire(2500, TimeUnit.Milliseconds))
 				{
 					throw new RuntimeException("Time out waiting to lock camera opening.");
 				}
-				manager.OpenCamera(mCameraId, mStateCallback, BackgroundHandler);
+				manager.OpenCamera(_mCameraId, _mStateCallback, BackgroundHandler);
 			}
 			catch (CameraAccessException e)
 			{
@@ -330,10 +273,10 @@ namespace RobotManager.Droid.CustomRenderer
 					CameraDevice.Close();
 					CameraDevice = null;
 				}
-				if (null != mImageReader)
+				if (null != _mImageReader)
 				{
-					mImageReader.Close();
-					mImageReader = null;
+					_mImageReader.Close();
+					_mImageReader = null;
 				}
 			}
 			catch (InterruptedException e)
@@ -351,9 +294,9 @@ namespace RobotManager.Droid.CustomRenderer
 		/// </summary>
 		private void StartBackgroundThread()
 		{
-			mBackgroundThread = new HandlerThread("CameraBackground");
-			mBackgroundThread.Start();
-			BackgroundHandler = new Handler(mBackgroundThread.Looper);
+			_mBackgroundThread = new HandlerThread("CameraBackground");
+			_mBackgroundThread.Start();
+			BackgroundHandler = new Handler(_mBackgroundThread.Looper);
 		}
 
 		/// <summary>
@@ -361,11 +304,11 @@ namespace RobotManager.Droid.CustomRenderer
 		/// </summary>
 		private void StopBackgroundThread()
 		{
-			mBackgroundThread.QuitSafely();
+			_mBackgroundThread.QuitSafely();
 			try
 			{
-				mBackgroundThread.Join();
-				mBackgroundThread = null;
+				_mBackgroundThread.Join();
+				_mBackgroundThread = null;
 				BackgroundHandler = null;
 			}
 			catch (InterruptedException e)
@@ -381,22 +324,22 @@ namespace RobotManager.Droid.CustomRenderer
 		{
 			try
 			{
-				SurfaceTexture texture = TextureView.SurfaceTexture;
+				var texture = TextureView.SurfaceTexture;
 				if (texture == null)
 					throw new System.Exception($"{nameof(texture)} is null");
 
 				// We configure the size of default buffer to be the size of camera preview we want.
-				texture.SetDefaultBufferSize(mPreviewSize.Width, mPreviewSize.Height);
+				texture.SetDefaultBufferSize(_mPreviewSize.Width, _mPreviewSize.Height);
 
 				// This is the output Surface we need to start preview.
-				Surface surface = new Surface(texture);
+				var surface = new Surface(texture);
 
 				// We set up a CaptureRequest.Builder with the output Surface.
 				PreviewRequestBuilder = CameraDevice.CreateCaptureRequest(CameraTemplate.Preview);
 				PreviewRequestBuilder.AddTarget(surface);
 
 				// Here, we create a CameraCaptureSession for camera preview.
-				var surfaces = new List<Surface> { surface, mImageReader.Surface };
+				var surfaces = new List<Surface> { surface, _mImageReader.Surface };
 				CameraDevice.CreateCaptureSession(surfaces,
 					new CameraCaptureSessionStateCallback(this), null);
 			}
@@ -416,23 +359,23 @@ namespace RobotManager.Droid.CustomRenderer
 		public void ConfigureTransform(int viewWidth, int viewHeight)
 		{
 			var activity = Activity;
-			if (null == TextureView || null == mPreviewSize || null == activity)
+			if (null == TextureView || null == _mPreviewSize || null == activity)
 			{
 				return;
 			}
 			var rotation = (int)activity.WindowManager.DefaultDisplay.Rotation;
-			Matrix matrix = new Matrix();
-			RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
-			RectF bufferRect = new RectF(0, 0, mPreviewSize.Height, mPreviewSize.Width);
-			float centerX = viewRect.CenterX();
-			float centerY = viewRect.CenterY();
+			var matrix = new Matrix();
+			var viewRect = new RectF(0, 0, viewWidth, viewHeight);
+			var bufferRect = new RectF(0, 0, _mPreviewSize.Height, _mPreviewSize.Width);
+			var centerX = viewRect.CenterX();
+			var centerY = viewRect.CenterY();
 			if ((int)SurfaceOrientation.Rotation90 == rotation || (int)SurfaceOrientation.Rotation270 == rotation)
 			{
 				bufferRect.Offset(centerX - bufferRect.CenterX(), centerY - bufferRect.CenterY());
 				matrix.SetRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.Fill);
-				float scale = System.Math.Max(
-						(float)viewHeight / mPreviewSize.Height,
-						(float)viewWidth / mPreviewSize.Width);
+				var scale = System.Math.Max(
+						(float)viewHeight / _mPreviewSize.Height,
+						(float)viewWidth / _mPreviewSize.Width);
 				matrix.PostScale(scale, scale, centerX, centerY);
 				matrix.PostRotate(90 * (rotation - 2), centerX, centerY);
 			}
@@ -441,57 +384,6 @@ namespace RobotManager.Droid.CustomRenderer
 				matrix.PostRotate(180, centerX, centerY);
 			}
 			TextureView.SetTransform(matrix);
-		}
-
-		/// <summary>
-		/// Initiate a still image capture
-		/// </summary>
-		private void TakePicture()
-		{
-			LockFocus();
-		}
-
-		/// <summary>
-		/// Lock the focus as the first step for a still image capture
-		/// </summary>
-		private void LockFocus()
-		{
-			try
-			{
-				// This is how to tell the camera to lock focus.
-				PreviewRequestBuilder.Set(CaptureRequest.ControlAfTrigger,
-					(int)ControlAFTrigger.Start);
-				// Tell #mCaptureCallback to wait for the lock.
-				mState = CameraState.WaitingLock;
-				CaptureSession.Capture(PreviewRequestBuilder.Build(), CaptureCallback,
-						BackgroundHandler);
-			}
-			catch (CameraAccessException e)
-			{
-				e.PrintStackTrace();
-			}
-		}
-
-		/// <summary>
-		/// Run the precapture sequence for capturing a still image. This method should be called when
-		/// we get a response in CaptureCallback from LockFocus()
-		/// </summary>
-		private void RunPrecaptureSequence()
-		{
-			try
-			{
-				// This is how to tell the camera to trigger.
-				PreviewRequestBuilder.Set(CaptureRequest.ControlAePrecaptureTrigger,
-					(int)ControlAEPrecaptureTrigger.Start);
-				// Tell CaptureCallback to wait for the precapture sequence to be set.
-				mState = CameraState.WaitingPrecapture;
-				CaptureSession.Capture(PreviewRequestBuilder.Build(), CaptureCallback,
-						BackgroundHandler);
-			}
-			catch (CameraAccessException e)
-			{
-				e.PrintStackTrace();
-			}
 		}
 
 		/// <summary>
@@ -508,17 +400,16 @@ namespace RobotManager.Droid.CustomRenderer
 					return;
 				}
 				// This is the CaptureRequest.Builder that we use to take a picture.
-				CaptureRequest.Builder captureBuilder =
+				var captureBuilder =
 						CameraDevice.CreateCaptureRequest(CameraTemplate.StillCapture);
-				captureBuilder.AddTarget(mImageReader.Surface);
+				captureBuilder.AddTarget(_mImageReader.Surface);
 
 				// Use the same AE and AF modes as the preview.
 				captureBuilder.Set(CaptureRequest.ControlAfMode,
 						(int)ControlAFMode.ContinuousPicture);
-				SetAutoFlash(captureBuilder);
 
 				// Orientation
-				int rotation = (int)activity.WindowManager.DefaultDisplay.Rotation;
+				var rotation = (int)activity.WindowManager.DefaultDisplay.Rotation;
 				captureBuilder.Set(CaptureRequest.JpegOrientation, GetOrientation(rotation));
 
 				var captureCallback = new CameraCaptureSessionCaptureCallback2(this);
@@ -543,7 +434,7 @@ namespace RobotManager.Droid.CustomRenderer
 			// We have to take that into account and rotate JPEG properly.
 			// For devices with orientation of 90, we simply return our mapping from ORIENTATIONS.
 			// For devices with orientation of 270, we need to rotate the JPEG 180 degrees.
-			return (Orientations.Get(rotation) + mSensorOrientation + 270) % 360;
+			return (Orientations.Get(rotation) + _mSensorOrientation + 270) % 360;
 		}
 
 		/// <summary>
@@ -557,7 +448,6 @@ namespace RobotManager.Droid.CustomRenderer
 				// Reset the auto-focus trigger
 				PreviewRequestBuilder.Set(CaptureRequest.ControlAfTrigger,
 					(int)ControlAFTrigger.Cancel);
-				SetAutoFlash(PreviewRequestBuilder);
 				CaptureSession.Capture(PreviewRequestBuilder.Build(), CaptureCallback,
 					BackgroundHandler);
 				// After this, the camera will go back to the normal state of preview.
@@ -570,15 +460,7 @@ namespace RobotManager.Droid.CustomRenderer
 				e.PrintStackTrace();
 			}
 		}
-
-		public void SetAutoFlash(CaptureRequest.Builder requestBuilder)
-		{
-			if (mFlashSupported)
-			{
-				requestBuilder.Set(CaptureRequest.ControlAeMode, (int)ControlAEMode.OnAutoFlash);
-			}
-		}
-
+		
 		#region Camera2 sample code
 		/**
 		 * Conversion from screen rotation to JPEG orientation.
@@ -612,12 +494,12 @@ namespace RobotManager.Droid.CustomRenderer
 		/// </summary>
 		const int MaxPreviewHeight = 1080;
 
-		private TextureViewSurfaceTextureListener mSurfaceTextureListener;
+		private TextureViewSurfaceTextureListener _mSurfaceTextureListener;
 
 		/// <summary>
 		/// Id of the current <see cref="mCameraDevice"/>
 		/// </summary>
-		string mCameraId;
+		string _mCameraId;
 
 		/// <summary>
 		/// A TextureVuew for camera preview
@@ -637,17 +519,17 @@ namespace RobotManager.Droid.CustomRenderer
 		/// <summary>
 		/// The Size of camera preview
 		/// </summary>
-		Size mPreviewSize;
+		private Android.Util.Size _mPreviewSize;
 
 		/// <summary>
 		/// The CameraDeviceStateCallback is called when CameraDevice changes its state
 		/// </summary>
-		CameraDeviceStateCallback mStateCallback;
+		private CameraDeviceStateCallback _mStateCallback;
 
 		/// <summary>
 		/// An additional thread for running tasks that shouldn't block the UI
 		/// </summary>
-		HandlerThread mBackgroundThread;
+		private HandlerThread _mBackgroundThread;
 
 		/// <summary>
 		/// A Handler for running tasks in the background
@@ -657,7 +539,7 @@ namespace RobotManager.Droid.CustomRenderer
 		/// <summary>
 		/// An ImageReader that handlers still image capture
 		/// </summary>
-		ImageReader mImageReader;
+		private ImageReader _mImageReader;
 
 		/// <summary>
 		/// CaptureRequest.Builder for the camera preview
@@ -678,16 +560,11 @@ namespace RobotManager.Droid.CustomRenderer
 		/// A Semaphore to prevent the app from exiting before closing the camera
 		/// </summary>
 		public Semaphore mCameraOpenCloseLock = new Semaphore(1);
-
-		/// <summary>
-		/// Whether the current camera device supports Flash or not
-		/// </summary>
-		bool mFlashSupported;
-
+		
 		/// <summary>
 		/// Orientation of the camera sensor
 		/// </summary>
-		int mSensorOrientation;
+		private int _mSensorOrientation;
 
 		/// <summary>
 		/// A CameraCaptureSessionCaptureCallback that handles events related to JPEG capture
@@ -724,19 +601,23 @@ namespace RobotManager.Droid.CustomRenderer
 		/// <param name="maxHeight">The maximum height that can be chosen</param>
 		/// <param name="aspectRatio">The aspect ratio</param>
 		/// <returns>The optimal Size, or an arbitrary one if none were big enough</returns>
-		private static Size ChooseOptimalSize(Size[] choices, int textureViewWidth,
-			int textureViewHeight, int maxWidth, int maxHeight, Size aspectRatio)
+		private static Android.Util.Size ChooseOptimalSize(Android.Util.Size[] choices,
+															int textureViewWidth,
+															int textureViewHeight,
+															int maxWidth,
+															int maxHeight,
+															Android.Util.Size aspectRatio)
 		{
 			// Collect the supported resolutions that are at least as big as the preview Surface
-			List<Size> bigEnough = new List<Size>();
+			var bigEnough = new List<Android.Util.Size>();
 			// Collect the supported resolutions that are smaller than the preview Surface
-			List<Size> notBigEnough = new List<Size>();
-			int w = aspectRatio.Width;
-			int h = aspectRatio.Height;
-			foreach (Size option in choices)
+			var notBigEnough = new List<Android.Util.Size>();
+			var width = aspectRatio.Width;
+			var height = aspectRatio.Height;
+			foreach (Android.Util.Size option in choices)
 			{
 				if (option.Width <= maxWidth && option.Height <= maxHeight &&
-						option.Height == option.Width * h / w)
+						option.Height == option.Width * height / width)
 				{
 					if (option.Width >= textureViewWidth &&
 						option.Height >= textureViewHeight)
@@ -754,47 +635,16 @@ namespace RobotManager.Droid.CustomRenderer
 			// largest of those not big enough.
 			if (bigEnough.Any())
 			{
-				return (Size)Collections.Min(bigEnough, new CompareSizesByArea());
+				return (Android.Util.Size)Collections.Min(bigEnough, new CompareSizesByArea());
 			}
-			else if (notBigEnough.Any())
+			if (notBigEnough.Any())
 			{
-				return (Size)Collections.Max(notBigEnough, new CompareSizesByArea());
+				return (Android.Util.Size)Collections.Max(notBigEnough, new CompareSizesByArea());
 			}
-			else
-			{
-				Log.Error(Tag, "Couldn't find any suitable preview size");
-				return choices[0];
-			}
+
+			Log.Error(Tag, "Couldn't find any suitable preview size");
+			return choices[0];
 		}
 		#endregion
-
-
-		public async void OnImageAvailable(ImageReader reader)
-		{
-			var image = reader.AcquireNextImage();
-			var plane = image.GetPlanes()[0];
-			var buffer = plane.Buffer;
-			byte[] paso = new byte[buffer.Remaining()];
-			buffer.Get(paso);
-
-			//Bitmap bitmap =await BitmapFactory.DecodeByteArrayAsync(paso, 0, paso.Length);
-
-
-			//byte[] imageBytes = null;
-			//using (var imageStream = new MemoryStream())
-			//{
-			//    await bitmap.CompressAsync(Bitmap.CompressFormat.Jpeg, 50, imageStream);
-			//    bitmap.Recycle();
-			//    imageBytes = imageStream.ToArray();
-			//}
-			//image.Close();
-
-			var manipulatePic = (new SvgManipulatePhotoPage(paso));
-			Xamarin.Forms.Device.BeginInvokeOnMainThread(async () =>
-			{
-				await App.Current.MainPage.Navigation.PushAsync(manipulatePic, false);
-			});
-		}
-
 	}
 }
